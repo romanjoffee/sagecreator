@@ -1,0 +1,13 @@
+---
+- debug: var=venv_dir
+
+- name: install jupyter pip packages
+  pip:
+    name: "{{ packages }}"
+    virtualenv: "{{ venv_dir }}"
+    virtualenv_python: python3
+  vars:
+    packages:
+      - jupyter==1.0.0
+      - ipython==7.3.0
+      - environment_kernels==1.1.1

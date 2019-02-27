@@ -1,0 +1,40 @@
+---
+- set_fact:
+    app_current_dir: "/opt/{{ company }}/{{ owner }}/{{ service }}"
+    venv_dir: "/opt/{{ company }}/{{ owner }}/{{ service }}/venv"
+
+- name: Create app directory
+  become: true
+  file:
+    path: "{{ app_current_dir }}"
+    state: directory
+    mode: 0755
+    group: ubuntu
+    owner: ubuntu
+
+- name: Install required system packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - make
+      - build-essential
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - wget
+      - curl
+      - llvm
+      - libncurses5-dev
+      - libncursesw5-dev
+      - xz-utils
+      - tk-dev
+      - libffi-dev
+      - liblzma-dev
+      - python-openssl
+      - virtualenv

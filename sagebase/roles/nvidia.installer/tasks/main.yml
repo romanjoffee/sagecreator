@@ -1,0 +1,18 @@
+---
+#- name: install nvidia apt packages
+#  become: true
+#  apt:
+#    name: "{{ packages }}"
+#  vars:
+#    packages:
+#      - nvidia-docker
+
+- name: Install nvidia pip packages
+  become: true
+  pip:
+    name: "{{ packages }}"
+    virtualenv: "{{ venv_dir }}"
+    virtualenv_python: python3
+  vars:
+    packages:
+      - nvidia-docker-compose==0.1.6

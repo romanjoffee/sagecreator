@@ -1,0 +1,15 @@
+- copy: dest=/etc/hostname content="{{ ec2_tag_Name }}" mode=644
+  become: true
+  when: cloud_type=='ec2'
+
+- shell: "hostname {{ ec2_tag_Name }}"
+  become: true
+  when: cloud_type=='ec2'
+
+- name: add hostname to /etc/hosts
+  become: true
+  lineinfile: >
+    dest=/etc/hosts
+    line='127.0.0.1 localhost {{ ec2_tag_Name }}'
+    regexp='^127\.0\.0\.1'
+    state=present

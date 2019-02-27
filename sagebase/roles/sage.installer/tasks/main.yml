@@ -1,0 +1,39 @@
+---
+- name: Create work directory
+  file:
+    path: "{{ app_current_dir }}/work"
+    state: directory
+    mode: 0755
+  register: work_dir
+
+#- name: ensure pip is up to date
+#  easy_install: name=pip state=latest
+#  become: true
+#  tags:
+#    - configure
+
+- name: Copy requirements.txt
+  copy: src=requirements.txt dest="{{ app_current_dir }}/" owner="{{ app_user }}" group="{{ app_group }}" mode=775
+  tags:
+    - configure
+
+- name: Copy sample notebook
+  copy: src=sample_notebook.ipynb dest="{{ work_dir.path }}/" owner="{{ app_user }}" group="{{ app_group }}" mode=775
+  tags:
+    - configure
+
+- name: Initialize jupyter kernel
+  shell: "{{ venv_dir }}/bin/ipython kernel install --user --name={{ jupyter_kernel_name }}"
+  args:
+    chdir: "{{ app_current_dir }}"
+
+- name: Initialize jupyter notebook
+  shell: "{{ venv_dir }}/bin/jupyter notebook {{ work_dir.path }}/sample_notebook.ipynb --no-browser --port={{ default_jupyter_remote_port }} --NotebookApp.token='' --NotebookApp.password='' >/dev/null 2>&1 &"  #--ip={{ service_hosts[0].private_ip_address }}
+  args:
+    chdir: "{{ app_current_dir }}"
+
+- name: Install requirements. Installation can take up to 5 minutes.
+  pip:
+    requirements: "{{ app_current_dir }}/requirements.txt"
+    virtualenv: "{{ venv_dir }}"
+    virtualenv_python: python3

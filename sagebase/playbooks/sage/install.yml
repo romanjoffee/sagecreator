@@ -1,0 +1,30 @@
+---
+- name: Get remote hosts for the service
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - set_fact:
+        service_hosts: "{{ query('hosts_by_service', env=env, owner=owner, service=service) }}"
+
+- name: Setup remote jupyter channel
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Kill the jupyter channel process
+      shell: "lsof -ti:{{ default_jupyter_local_port }} | xargs kill -9"
+
+    - name: Initialize local to remote channel
+      shell: "ssh -N -f -L localhost:{{ default_jupyter_local_port }}:localhost:{{ default_jupyter_remote_port }} {{ app_user }}@{{ service_hosts[0].ip_address }}"
+
+- name: Install software
+  hosts: "{{ hostvars['localhost']['service_hosts'] | map(attribute='ip_address') | list }}"
+  gather_facts: True
+
+  pre_tasks:
+    - set_fact:
+        service_hosts: "{{ hostvars['localhost']['service_hosts'] }}"
+  roles:
+    - sage.initializer
+    - sage.installer

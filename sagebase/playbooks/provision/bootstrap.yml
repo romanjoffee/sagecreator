@@ -1,0 +1,239 @@
+- name: Bootstrap servers
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    _cluster_size: "{{ cluster_size | default(1) }}"
+    _instance_type: "{{ instance_type | default(default_instance_type) }}"
+    _user_data_script: "{{ playbook_dir }}/../../templates/user_data.sh"
+    _ec2_termination_protection: "{{ ec2_termination_protection | default(False) }}"
+    _aws_region: "{{ aws_region | default(default_aws_region) }}"
+
+  tasks:
+#    - name: Printing all the environment​ variables
+#      debug:
+#        msg: "{{ ansible_env }}"
+
+    - name: Find VPC
+      ec2_vpc_net_facts:
+        region: "{{ _aws_region }}"
+        filters:
+          "tag:Name": "{{ vpc_name }}"
+      register: vpc_existing
+
+    - name: Get VPC
+      ec2_vpc_net:
+        name: "{{ vpc_name }}"
+        cidr_block: "{{ cidr_block | default(default_cidr_block) }}"
+        region: "{{ _aws_region }}"
+        tags:
+          Company: "{{ company }}"
+          Owner: "{{ owner }}"
+        tenancy: default
+      register: vpc_new
+      when: vpc_existing.vpcs|length == 0
+
+    - set_fact:
+        vpc_id: "{{ vpc_existing.vpcs[0].vpc_id if (vpc_existing.vpcs is defined and (vpc_existing.vpcs|length) > 0) else vpc_new.vpc.id }}"
+
+    - name: Get igw
+      ec2_vpc_igw:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ _aws_region }}"
+        tags:
+          Name: "{{ igw_name }}"
+          Company: "{{ company }}"
+          Owner: "{{ owner }}"
+      register: igw
+
+    - name: Get subnets
+      ec2_vpc_subnet:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ _aws_region }}"
+        az: "{{ item.0 }}"
+        cidr: "{{ item.1 }}"
+        tags:
+          Name: "{{ subnet_name }}-{{ item.0 }}"
+          Company: "{{ company }}"
+          Owner: "{{ owner }}"
+      with_together:
+        - "{{ default_azs }}"
+        - "{{ default_subnet_cidr_blocks }}"
+      register: subnets
+
+#    - debug: var=subnets.results
+
+    - name: Set up public subnet route table if absent
+      ec2_vpc_route_table:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ _aws_region }}"
+        tags:
+          Name: "{{ route_table_name }}"
+          Company: "{{ company }}"
+          Owner: "{{ owner }}"
+        subnets: "{{ default_subnet_cidr_blocks }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ igw.gateway_id }}"
+      register: public_route_table
+
+    - name: Find AMI
+      ec2_ami_facts:
+        region: "{{ _aws_region }}"
+        image_ids: "{{ ami_id | default(default_ami_id) }}"
+      register: ami
+
+    - name: Map disks
+      block_device_mapping:
+        instance_type: "{{ _instance_type }}"
+        os_type: "{{ default_ami_os_type }}"
+        root_volume_type: "{{ root_volume_type | default('standard') }}"
+        root_volume_size: "{{ root_volume_size | default(75) }}"
+        ebs_create_volumes: "{{ ebs_create_volumes | default(False) }}"
+        ebs_volume_size: "{{ ebs_volume_size_gb | default(40) }}"
+        ebs_volume_iops: "{{ ebs_volume_iops | default(omit) }}"
+        ebs_volume_type: "{{ ebs_volume_type | default('standard') }}"
+        ebs_volume_count: "{{ ebs_volume_count | default(1) }}"
+        ebs_delete_on_termination: "{{ ebs_delete_on_termination | default(True) }}"
+      register: bdm_vols
+
+    - name: Create security group if absent
+      ec2_group:
+        name: "{{ security_group_name }}"
+        description: "Security group of {{ service }}"
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ _aws_region }}"
+        rules:
+          - proto: all
+            group_name: "{{ security_group_name }}"
+            rule_desc: "loop back"
+          - proto: tcp
+            ports: 22
+            cidr_ip: 0.0.0.0/0
+            rule_desc: "ssh"
+        rules_egress:
+          - proto: all
+            ports: 0-65535
+            cidr_ip: 0.0.0.0/0
+        tags:
+          Name: "{{ security_group_name }}"
+          Company: "{{ company }}"
+          Owner: "{{ owner }}"
+      register: security_group
+
+    - name: Create a key pair if absent
+      ec2_key:
+        name: "{{ key_pair_name }}"
+        region: "{{ _aws_region }}"
+        force: false
+      register: key_pair_response
+      no_log: true
+
+    - name: Store private key if new
+      block:
+        - name: Store key file
+          copy:
+            content: "{{ key_pair_response.key.private_key }}"
+            dest: "{{ ansible_ssh_private_key_file }}"
+        - name: Mod key file
+          file:
+            path: "{{ ansible_ssh_private_key_file }}"
+            mode: 0600
+      when: key_pair_response.key.private_key is defined
+      no_log: true
+
+    - name: Provision instances. Instance provision can take up to 5 minutes.
+      ec2:
+        key_name: "{{ key_pair_name }}"
+        region: "{{ _aws_region }}"
+        instance_type: "{{ _instance_type }}"
+        image: "{{ ami.images[0].image_id }}"
+        group: "{{ security_group_name }}"
+
+        vpc_subnets: "{{ subnets.results }}"
+
+        spot_price: "{{ spot_price }}"
+        spot_type: "{{ spot_type }}"
+        spot_wait_timeout: 45
+
+        wait: true
+        ebs_optimized: "{{ True if _instance_type in ebs_optimized_types else False }}"
+        volumes: "{{ bdm_vols.result }}"
+        #instance_profile_name: "{{ _iam_role if instance_name is not defined else None }}"
+        exact_count: "{{ _cluster_size if instance_name is not defined else omit }}"
+        user_data: "{{ lookup('template', _user_data_script) }}"
+        private_ip: "{{ private_ip_address | default(omit)}}"
+        assign_public_ip: "{{ assign_public_ip | default('yes')}}"
+        termination_protection: "{{ _ec2_termination_protection }}"
+        count_tag:
+          Company: "{{ company }}"
+          Owner: "{{ owner }}"
+          Service: "{{ service }}"
+          Environment: "{{ env }}"
+        instance_tags:
+          Company: "{{ company }}"
+          Owner: "{{ owner }}"
+          Service: "{{ service }}"
+          Environment: "{{ env }}"
+      register: ec2
+
+    - name: Add names to instances
+      ec2_tag: resource={{ item.id }} region={{ _aws_region }} state=present
+      args:
+        tags:
+          Name: "{{ item.name }}"
+      with_items: "{{ query('instance_name_mapping', env=env, owner=owner, service=service, instances=ec2.instances) }}"
+      register: tagged_instances
+
+    - debug: var=tagged_instances
+
+    - name: Add to inventory
+      add_host: >
+        hostname={{ item.item.public_dns_name }}
+        groupname='just_created'
+        service={{ service }}
+        ec2_tag_Service={{ service }}
+        ec2_tag_Name={{ item.item.name }}
+        ec2_tag_Owner={{ owner }}
+        ec2_private_ip_address={{ item.item.private_ip }}
+        ec2_public_dns_name={{ item.item.public_dns_name }}
+        ec2_os_type={{ default_ami_os_type | capitalize }}
+      with_items: "{{ tagged_instances.results }}"
+
+    - name: Retrieve all volumes
+      ec2_vol:
+        instance: "{{ item.id }}"
+        region: "{{ _aws_region }}"
+        state: list
+      with_items: "{{ ec2.tagged_instances }}"
+      register: ec2_vol
+
+    - name: Ensure all volumes are tagged
+      ec2_tag:
+        region: "{{ _aws_region }}"
+        resource: "{{ item.1.id }}"
+        state: present
+        tags:
+          Company: "{{ company }}"
+          Owner: "{{ owner }}"
+          Service: "{{ service }}"
+          Environment: "{{ env }}"
+      with_subelements:
+        - "{{ ec2_vol.results }}"
+        - volumes
+
+#    - meta: end_play
+
+- name: Wait for servers to be available
+  hosts: "{{ 'just_created' }}"
+  gather_facts: False
+  tasks:
+    - wait_for_connection:
+        timeout: 300
+        sleep: 5
+
+- name: Post tasks
+  hosts: "{{ 'just_created' }}"
+  gather_facts: False
+  roles:
+    - provision.post-tasks

@@ -1,0 +1,23 @@
+- name: Terminate servers
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    _aws_region: "{{ aws_region | default(default_aws_region) }}"
+
+  tasks:
+    - name: Gather instances
+      ec2_instance_facts:
+        region: "{{ _aws_region }}"
+        filters:
+          "tag:Company": "{{ company }}"
+          "tag:Owner": "{{ owner }}"
+          "tag:Service": "{{ service }}"
+          "tag:Environment": "{{ env }}"
+      register: service_instances
+
+    - name: Terminate instances
+      ec2:
+        region: "{{ _aws_region }}"
+        state: absent
+        instance_ids: "{{ service_instances.instances | map(attribute='instance_id') | list }}"

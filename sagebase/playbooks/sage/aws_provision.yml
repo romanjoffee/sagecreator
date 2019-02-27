@@ -1,0 +1,6 @@
+- import_playbook: ../provision/bootstrap.yml
+#  vars:
+#    instance_type: "{{ instance_type }}"
+#    spot_price: "{{ spot_price }}"
+#    cluster_size: "{{ cluster_size }}"
+  when: cluster_size > 0
