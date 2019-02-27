@@ -22,7 +22,7 @@ class ConfiguratorTestCase(TestCase):
 
         try:
             configurator.persist("the_aws_access_key", "the_aws_secret_key", "the_company", "owner", "service", "t3.micro", 0.5, 1, "")
-            with open(persist_path, "r") as stream:
+            with open(str(persist_path), "r") as stream:
                 config = yaml.load(stream)
             self.assertEqual("the_aws_access_key", config.get("aws_access_key"))
             self.assertEqual("the_aws_secret_key", base64.b64decode(config.get("aws_secret_key")).decode("utf-8"))
