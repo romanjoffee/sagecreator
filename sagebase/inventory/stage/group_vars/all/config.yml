@@ -1,0 +1,33 @@
+app_group: ubuntu
+app_s3_bucket: '{{ company }}-{{ owner }}-artifacts-{{ env }}'
+app_user: ubuntu
+aws_access_key: AKIAJ7NHBCNVLZN42CSA
+aws_secret_key: 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
+cloud_type: ec2
+cluster_size: 1
+company: bellvenue
+default_ami_id: ami-0f9e8c4a1305ecd22
+default_ami_os_type: ubuntu
+default_aws_region: us-east-1
+#default_az: us-east-1b
+
+default_cidr_block: 10.100.0.0/16
+default_iam_role: '{{ env }}-minimal'
+default_instance_type: t3.micro
+default_private_key_file: pkey.pem
+env: stage
+igw_name: '{{ company }}-{{ owner }}-igw'
+instance_type: t3.small
+key_pair_name: '{{ company }}-{{ owner }}-keypair'
+owner: evoneutron
+route_table_name: '{{ company }}-{{ owner }}-routing'
+security_group_name: '{{ company }}-{{ owner }}-{{ service }}-{{ env }}'
+service: 'grooks'
+spot_price: 0.5
+spot_type: one-time
+subnet_name: '{{ company }}-{{ owner }}-subnet'
+vpc_name: '{{ company }}-{{ owner }}-vpc'
+default_azs: ['{{ default_aws_region }}a','{{ default_aws_region }}b','{{ default_aws_region }}c','{{ default_aws_region }}d','{{ default_aws_region }}e']
+default_subnet_cidr_blocks: ['10.100.0.0/20','10.100.16.0/20','10.100.32.0/20','10.100.48.0/20','10.100.64.0/20']
+jupyter_remote_port: 8888
+jupyter_local_port: 9000

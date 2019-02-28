@@ -10,14 +10,25 @@ class Provisioner:
     def __init__(self, configurator):
         self._configurator = configurator
 
-    def provision(self):
+    def provision(self, service, instance_type, spot_price, cluster_size):
         props = self._configurator.get_properties()
+        cluster_config = {'service': service,
+                          'instance_type': instance_type,
+                          'spot_price': spot_price,
+                          'cluster_size': cluster_size}
+        props.update(cluster_config)
         private_key_file = self._get_private_key_file(props)
         current_env = self._get_env(props)
-        self._call_bootstrap_script(private_key_file, current_env)
+        self._call_bootstrap_script(props, private_key_file, current_env)
 
-    def _call_bootstrap_script(self, private_key_file, current_env):
-        rc = subprocess.call(["{}/bootstrap.sh".format(self._configurator.get_root_path()), private_key_file], env=current_env)
+    def _call_bootstrap_script(self, props, private_key_file, current_env):
+        rc = subprocess.call(
+            ["{}/bootstrap.sh".format(self._configurator.get_root_path()),
+             "--{}={}".format('private_key_file', private_key_file),
+             "--{}={}".format('service', props.get('service')),
+             "--{}={}".format('instance_type', props.get('instance_type')),
+             "--{}={}".format('spot_price', props.get('spot_price')),
+             "--{}={}".format('cluster_size', props.get('cluster_size'))], env=current_env)
         return rc
 
     def terminate(self):

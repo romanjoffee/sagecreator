@@ -6,17 +6,17 @@ spot_type: "one-time"
 env: stage
 
 #derived
-app_user: ubuntu
-app_group: ubuntu
 app_s3_bucket: "{{ company }}-{{ owner }}-artifacts-{{ env }}"
 vpc_name: "{{ company }}-{{ owner }}-vpc"
 igw_name: "{{ company }}-{{ owner }}-igw"
 subnet_name: "{{ company }}-{{ owner }}-subnet"
 route_table_name: "{{ company }}-{{ owner }}-routing"
-security_group_name: "{{ company }}-{{ owner }}-{{ service }}-{{ env }}"
 key_pair_name: "{{ company }}-{{ owner }}-keypair"
+security_group_name: "{{ company }}-{{ owner }}-{{ service }}-{{ env }}"
 
 #default
+app_user: ubuntu
+app_group: ubuntu
 default_aws_region: us-east-1
 default_cidr_block: 10.100.0.0/16
 default_ami_os_type: "ubuntu"

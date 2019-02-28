@@ -5,7 +5,7 @@ SageCreator
 |
 | SageCreator is a package meant to simplify cluster setup for Machine Learning in AWS.
 | It does all the heavy lifting to get cluster up and running in a matter of minutes on any of the AWS instance type(s).
-| It is using **spot-instances** by default so it can significantly reduce total cost of running the cluster.
+| It is using **spot-instances** by default which can significantly reduce total cost of running the cluster.
 | If spot instance(s) are not available or the spot-instance price is too low, it falls back to **on-demand** instance(s).
 |
 | After provision you can access **jupyter notebook** that can run your code against provisioned server(s)
@@ -42,7 +42,7 @@ To provision the cluster you need an IAM user with:
 Execution
 ---------
 
-After the installation, configure the tool by filling out configuration parameters:
+After the installation, configure the tool by specifying configuration parameters:
 
 ---------
 
