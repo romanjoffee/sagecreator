@@ -1,12 +1,12 @@
-import yaml
-import sys
-import logging
 import base64
+import logging
+import sys
+from pathlib import Path
+
+import yaml
 
 logging.basicConfig(level=logging.INFO, format='%(name)-12s: %(levelname)-8s: %(message)s')
 log = logging.getLogger(__name__)
-
-from pathlib import Path
 
 
 class Configurator:

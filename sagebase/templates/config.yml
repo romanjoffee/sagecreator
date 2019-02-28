@@ -1,7 +1,6 @@
 cloud_type: ec2
 
 #optional
-cluster_size: 1
 spot_type: "one-time"
 env: stage
 
@@ -12,7 +11,6 @@ igw_name: "{{ company }}-{{ owner }}-igw"
 subnet_name: "{{ company }}-{{ owner }}-subnet"
 route_table_name: "{{ company }}-{{ owner }}-routing"
 key_pair_name: "{{ company }}-{{ owner }}-keypair"
-security_group_name: "{{ company }}-{{ owner }}-{{ service }}-{{ env }}"
 
 #default
 app_user: ubuntu

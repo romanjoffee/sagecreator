@@ -4,10 +4,10 @@ ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${ROOT_DIR}/util.sh
 NO_ERROR=0
 
-export ANSIBLE_CONFIG=$ROOT_DIR/ansible.cfg
-export ANSIBLE_INVENTORY=$ROOT_DIR/inventory/stage/ec2.py
-export EC2_INI_PATH=$ROOT_DIR/inventory/stage/ec2.ini
-export ANSIBLE_ROLES_PATH=$ROOT_DIR/roles
+export ANSIBLE_CONFIG=${ROOT_DIR}/ansible.cfg
+export ANSIBLE_INVENTORY=${ROOT_DIR}/inventory/stage/ec2.py
+export EC2_INI_PATH=${ROOT_DIR}/inventory/stage/ec2.ini
+export ANSIBLE_ROLES_PATH=${ROOT_DIR}/roles
 
 function parse_args() {
   while [[ $# -gt 0 ]]; do
@@ -62,7 +62,7 @@ function provision() {
     parse_args "$@"
 
     echo "...Provisioning cluster..."
-    ansible-playbook --key-file ${private_key_file} -i ${ROOT_DIR}/inventory/stage ${ROOT_DIR}/playbooks/sage/aws_provision.yml -e service=${service} -e instance_type=${instance_type} -e spot_price=${spot_price} -e cluster_size=${cluster_size} -vvv
+    ansible-playbook --key-file ${private_key_file} -i ${ROOT_DIR}/inventory/stage ${ROOT_DIR}/playbooks/sage/aws_provision.yml -e service=${service} -e instance_type=${instance_type} -e spot_price=${spot_price} -e cluster_size=${cluster_size} #-vvv
     return $NO_ERROR
 }
 
@@ -83,11 +83,12 @@ function refresh_inventory() {
 
 function run() {
     local private_key_file
+    local service
     parse_args "$@"
 
     provision "$@"
-#    refresh_inventory
-#    install private_key_file=${private_key_file} service=${service}
+    refresh_inventory
+    install private_key_file=${private_key_file} service=${service}
 
     return $NO_ERROR
 }
