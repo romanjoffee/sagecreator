@@ -52,10 +52,11 @@ def provision(service, instance_type, spot_price, cluster_size):
 
 
 @cli.command(help="Terminate instance(s)")
+@click.option('--service', prompt=True, required=True, help="Name of the service")
 @click.confirmation_option(prompt='Are you sure you want to terminate the cluster?')
-def terminate():
+def terminate(service):
     prov = Provisioner(configurator)
-    prov.terminate()
+    prov.terminate(service)
 
 
 @cli.command(help="Full path to configuration file")

@@ -30,9 +30,10 @@ class Provisioner:
              "--{}={}".format('cluster_size', int(props.get('cluster_size')))], env=current_env)
         return rc
 
-    def terminate(self):
+    def terminate(self, service):
         current_env = self._get_env(self._configurator.get_properties())
-        rc = subprocess.call(["{}/terminate.sh".format(self._configurator.get_root_path())], env=current_env)
+        rc = subprocess.call(["{}/terminate.sh".format(self._configurator.get_root_path()),
+                              "--{}={}".format('service', service)], env=current_env)
         return rc
 
     def _get_env(self, props):

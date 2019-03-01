@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${ROOT_DIR}/util.sh
+source ${ROOT_DIR}/utils.sh
 NO_ERROR=0
 
 export ANSIBLE_CONFIG=${ROOT_DIR}/ansible.cfg

@@ -4,3 +4,4 @@ build/
 .idea/
 *.retry
 *.pyc
+*.egg-info/
