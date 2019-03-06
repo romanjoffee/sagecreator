@@ -4,6 +4,8 @@ from unittest.mock import Mock
 from sagecreator import Configurator
 from sagecreator import Provisioner
 
+import os
+
 
 class ProvisionerTestCase(TestCase):
     _configurator = None
@@ -20,13 +22,20 @@ class ProvisionerTestCase(TestCase):
             self.assertTrue("Property aws_secret_key is undefined" in str(context))
 
     def test_provision_should_call_script(self):
+        mock_props = {"aws_access_key": "valid", "aws_secret_key": b'dGhlX2F3c19zZWNyZXRfa2V5', "default_private_key_file": "valid"}
         self._configurator.get_properties = Mock(
-            return_value={"aws_access_key": "valid", "aws_secret_key": b'dGhlX2F3c19zZWNyZXRfa2V5', "default_private_key_file": "valid"})
+            return_value=mock_props)
+
+        current_env = os.environ.copy()
+        current_env["AWS_ACCESS_KEY_ID"] = "valid"
+        current_env["AWS_SECRET_ACCESS_KEY"] = "the_aws_secret_key"
 
         prov = Provisioner(self._configurator)
         prov._call_bootstrap_script = Mock(return_value=None)
         prov.provision("service", "t3.small", 0.2, 1)
-        prov._call_bootstrap_script.assert_called_once()
+        mock_props.update({"service": "service", "instance_type": "t3.small", "spot_price": 0.2, "cluster_size": 1})
+        prov._call_bootstrap_script.assert_called_once_with(mock_props, "{}/.ssh/{}".format(self._configurator.get_root_path(), "valid"),
+                                                            current_env)
 
 
 if __name__ == '__main__':
