@@ -21,14 +21,12 @@ class ConfiguratorTestCase(TestCase):
         configurator.get_root_path = Mock(return_value=self._tests_dir)
 
         try:
-            configurator.persist("the_aws_access_key", "the_aws_secret_key", "the_company", "owner", "service", "t3.micro", 0.5, 1, "")
+            configurator.persist("the_aws_access_key", "the_aws_secret_key", "the_company", "owner", "pkey")
             with open(str(persist_path), "r") as stream:
                 config = yaml.load(stream)
             self.assertEqual("the_aws_access_key", config.get("aws_access_key"))
             self.assertEqual("the_aws_secret_key", base64.b64decode(config.get("aws_secret_key")).decode("utf-8"))
             self.assertEqual("the_company", config.get("company"))
-            self.assertEqual(0.5, config.get("spot_price"))
-            self.assertEqual(1, config.get("cluster_size"))
-            self.assertEqual("t3.micro", config.get("instance_type"))
+            self.assertEqual("pkey", config.get("private_key_file"))
         finally:
             persist_path.unlink()
