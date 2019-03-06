@@ -25,7 +25,6 @@ class ProvisionerTestCase(TestCase):
         mock_props = {"aws_access_key": "valid", "aws_secret_key": b'dGhlX2F3c19zZWNyZXRfa2V5', "default_private_key_file": "valid"}
         self._configurator.get_properties = Mock(
             return_value=mock_props)
-
         current_env = os.environ.copy()
         current_env["AWS_ACCESS_KEY_ID"] = "valid"
         current_env["AWS_SECRET_ACCESS_KEY"] = "the_aws_secret_key"
