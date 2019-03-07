@@ -42,13 +42,13 @@ class Configurator:
         return props
 
     def get_config_path(self):
-        return "{}/inventory/stage/group_vars/all/{}".format(self._root_path, "config.yml")
+        return "{}/inventory/stage/group_vars/all/{}".format(self.get_root_path(), "config.yml")
 
     def get_root_path(self):
         return self._root_path
 
-    def get_valid_instance_types(self):
-        valid_types_path = "{}/inventory/stage/group_vars/all/{}".format(self._root_path, "valid_instance_types.yml")
-        with open(str(valid_types_path), "r") as stream:
-            props = yaml.load(stream)
-        return props.get("valid_instance_types")
+    # def get_valid_instance_types(self):
+    #     valid_types_path = "{}/inventory/stage/group_vars/all/{}".format(self._root_path, "valid_instance_types.yml")
+    #     with open(str(valid_types_path), "r") as stream:
+    #         props = yaml.load(stream)
+    #     return props.get("valid_instance_types")
