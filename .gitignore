@@ -1,8 +1,10 @@
+.idea/
 venv/
 dist/
 build/
-.idea/
 *.retry
 *.pyc
 *.egg-info/
 .coverage
+sagebase/.ssh/*
+sagebase/inventory/stage/group_vars/all/config.yml
