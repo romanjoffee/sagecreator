@@ -15,11 +15,13 @@ class Configurator:
         site_packages = next(p for p in sys.path if 'site-packages' in p)
         self._root_path = "{}/sagebase".format(site_packages)
 
-    def persist(self, access_key_id, secret_access_key, company, owner, private_key_file):
+    def persist(self, access_key_id, secret_access_key, company, owner, private_key_file, key_pair_name):
         config = {'aws_access_key': access_key_id,
                   'aws_secret_key': base64.b64encode(secret_access_key.encode("utf-8")),
                   'company': company,
                   'owner': owner}
+        if key_pair_name:
+            config.update({'key_pair_name': key_pair_name})
         if private_key_file:
             config.update({'private_key_file': private_key_file})
         template = self._read_template()

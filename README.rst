@@ -59,6 +59,7 @@ After the installation, configure the tool by specifying configuration parameter
 
 | Provision the cluster.
 | Provision step can take up to 20 minutes depending on network connection, cluster size, and instance type.
+|
 
 .. code-block:: text
 
@@ -70,15 +71,17 @@ After the installation, configure the tool by specifying configuration parameter
 
 .. image:: https://s3.amazonaws.com/evoneutron/github/sagecreator/provision1080.gif
 
-| Important: If provided **Spot instance price** is lower than current AWS spot instance price then **on-demand** instance(s) will be provisioned.
-| Thus, it is up to the user to ensure that provided spot instance price is high enough for the request to be fulfilled.
-| The tool provides no guarantee that the instance(s) will be provisioned at specified spot instance price.
-| It does provide guarantee that the cluster with specified configuration will be provisioned, hence it has to fall back to **on-demand** instances if it can't provision spot instances.
+| **Important**:
+| The tool provides no guarantee that the instance(s) will be provisioned at specified **Spot instance price**.
+| If specified Spot instance price is lower than current AWS spot instance price then **on-demand** instance(s) will be provisioned.
+| Thus, it is up to the user to ensure that specified price is high enough for the request to be fulfilled.
+| The tool does provide guarantee that the cluster with specified configuration will be provisioned and thus it has to fall back to **on-demand** instances if it can't provision spot instances.
 
 ---------
 
 | Show path of the cluster configuration file.
 | Though not necessary it is possible to manually edit that file with customizations prior to running **provision** step.
+|
 
 .. code-block:: text
 
