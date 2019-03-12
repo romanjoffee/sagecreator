@@ -19,7 +19,7 @@ default_aws_region: us-east-1
 default_cidr_block: 10.100.0.0/16
 default_ami_os_type: "ubuntu"
 default_ami_id: "ami-0f9e8c4a1305ecd22"   #ubuntu dl
-default_private_key_file: "pkey.pem"
+default_private_key_file_name: "pkey.pem"
 
 default_azs: ['{{ default_aws_region }}a','{{ default_aws_region }}b','{{ default_aws_region }}c','{{ default_aws_region }}d','{{ default_aws_region }}e']
 default_subnet_cidr_blocks: ['10.100.0.0/20','10.100.16.0/20','10.100.32.0/20','10.100.48.0/20','10.100.64.0/20']

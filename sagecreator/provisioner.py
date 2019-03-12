@@ -45,7 +45,7 @@ class Provisioner:
     def _get_private_key_file(self, props):
         if "private_key_file" in props:
             return props.get("private_key_file")
-        return "{}/.ssh/{}".format(self._configurator.get_root_path(), self.validate_and_get("default_private_key_file", props))
+        return "{}/.ssh/{}".format(self._configurator.get_root_path(), self.validate_and_get("default_private_key_file_name", props))
 
     @staticmethod
     def validate_and_get(prop_name, props):
