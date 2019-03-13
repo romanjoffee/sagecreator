@@ -54,7 +54,7 @@ After the installation, configure the tool by specifying configuration parameter
     Private key file: <Absolute path to private key file> (required only if Key pair name was provided))
 
 | **Company**, **Owner**, **Service** are required - those are used as tags for each instance in the cluster.
-| **Key pair name**, **Private key file** are optional - if provided, given 'key pair name'/'private key file' will be used to provision the cluster.
+| **Key pair name**, **Private key file** are optional - if provided, given 'key pair name' / 'private key file' will be used to provision the cluster.
 
 ---------
 
@@ -66,9 +66,9 @@ After the installation, configure the tool by specifying configuration parameter
 
     $ sage provision
     Service: <Name of your service>
-    Instance type [t3.small]: <Instance type> (optional, if not provided default t3.small will be used)
-    Spot instance price [0.1]: <Spot instance price> (optional, if not provided default price of $0.1 will be used)
-    Cluster size [1]: <Cluster size> (optional, if not provided default cluster with 1 node will be provisioned)
+    Instance type [t3.small]: <Instance type> (optional, defaults to t3.small)
+    Spot instance price [0.1]: <Spot instance price> (optional, defaults to $0.1 per instance)
+    Cluster size [1]: <Cluster size> (optional, defaults to 1 node)
 
 .. image:: https://s3.amazonaws.com/evoneutron/github/sagecreator/provision1080.gif
 
@@ -82,7 +82,6 @@ After the installation, configure the tool by specifying configuration parameter
 
 | Show path of the cluster configuration file.
 | Though not necessary it is possible to manually edit that file with customizations prior to running **provision** step.
-|
 
 .. code-block:: text
 
