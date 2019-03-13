@@ -8,7 +8,7 @@ SageCreator
 | It is using **spot instances** by default which can significantly reduce total cost of running the cluster.
 | If spot instances are not available or the specified spot instance price is too low, it falls back to **on-demand** instances.
 |
-| After provision you can access **Jupyter notebook** that can run your code against provisioned server(s)
+| After provision you can access `Jupyter notebook`_ that can run your code against provisioned server(s)
 
 Installation
 ------------
@@ -54,7 +54,7 @@ After the installation, configure the tool by specifying configuration parameter
     Private key file: <Absolute path to private key file> (required only if Key pair name was provided))
 
 | **Company**, **Owner**, **Service** are required - those are used as tags for each instance in the cluster.
-| **Key pair name/Private key file** are optional - if provided, given 'key pair name'/'private key file' will be used to provision the cluster.
+| **Key pair name**, **Private key file** are optional - if provided, given 'key pair name'/'private key file' will be used to provision the cluster.
 
 ---------
 
@@ -95,6 +95,8 @@ Terminate cluster. This operation terminates all cluster nodes matching tags tup
 .. code-block:: text
 
     $ sage terminate
+
+.. _Jupyter notebook:
 
 Jupyter access
 --------------
