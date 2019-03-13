@@ -21,3 +21,4 @@
         region: "{{ _aws_region }}"
         state: absent
         instance_ids: "{{ service_instances.instances | map(attribute='instance_id') | list }}"
+      when: service_instances.instances|length > 0

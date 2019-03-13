@@ -8,7 +8,7 @@ SageCreator
 | It is using **spot instances** by default which can significantly reduce total cost of running the cluster.
 | If spot instances are not available or the specified spot instance price is too low, it falls back to **on-demand** instances.
 |
-| After provision you can access `Jupyter notebook`_ that can run your code against provisioned server(s)
+| After provision you can access **Jupyter notebook** that can run your code against provisioned server(s). See `Jupyter access`_.
 
 Installation
 ------------
@@ -96,7 +96,7 @@ Terminate cluster. This operation terminates all cluster nodes matching tags tup
 
     $ sage terminate
 
-.. _Jupyter notebook:
+.. _Jupyter access:
 
 Jupyter access
 --------------
