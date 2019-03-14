@@ -3,6 +3,9 @@
   hosts: localhost
   connection: local
   gather_facts: False
+  vars:
+    service: "{{ service }}"
+    p_key_path: "{{ p_key_path }}"
   tasks:
     - set_fact:
         service_hosts: "{{ query('hosts_by_service', env=env, owner=owner, service=service) }}"
@@ -16,7 +19,7 @@
       shell: "lsof -ti:{{ default_jupyter_local_port }} | xargs kill -9"
 
     - name: Initialize local to remote channel
-      shell: "ssh -N -f -L localhost:{{ default_jupyter_local_port }}:localhost:{{ default_jupyter_remote_port }} {{ app_user }}@{{ service_hosts[0].ip_address }}"
+      shell: "ssh -i {{ p_key_path }} -N -f -L localhost:{{ default_jupyter_local_port }}:localhost:{{ default_jupyter_remote_port }} {{ app_user }}@{{ service_hosts[0].ip_address }}"
 
 - name: Install software
   hosts: "{{ hostvars['localhost']['service_hosts'] | map(attribute='ip_address') | list }}"

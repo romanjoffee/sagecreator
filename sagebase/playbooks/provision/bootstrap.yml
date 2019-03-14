@@ -3,11 +3,12 @@
   connection: local
   gather_facts: False
   vars:
-    _cluster_size: "{{ cluster_size | default(1) }}"
-    _instance_type: "{{ instance_type | default(default_instance_type) }}"
-    _user_data_script: "{{ playbook_dir }}/../../templates/user_data.sh"
-    _ec2_termination_protection: "{{ ec2_termination_protection | default(False) }}"
     _aws_region: "{{ aws_region | default(default_aws_region) }}"
+    _instance_type: "{{ instance_type }}"
+    _spot_price: "{{ spot_price }}"
+    _cluster_size: "{{ cluster_size }}"
+    _ec2_termination_protection: "{{ ec2_termination_protection | default(False) }}"
+    _user_data_script: "{{ playbook_dir }}/../../templates/user_data.sh"
 
   tasks:
 #    - name: Printing all the environment​ variables
@@ -35,6 +36,7 @@
 
     - set_fact:
         vpc_id: "{{ vpc_existing.vpcs[0].vpc_id if (vpc_existing.vpcs is defined and (vpc_existing.vpcs|length) > 0) else vpc_new.vpc.id }}"
+        security_group_name: "{{ company }}-{{ owner }}-{{ service }}-{{ env }}"
 
     - name: Get igw
       ec2_vpc_igw:
@@ -152,7 +154,7 @@
 
         vpc_subnets: "{{ subnets.results }}"
 
-        spot_price: "{{ spot_price }}"
+        spot_price: "{{ _spot_price }}"
         spot_type: "{{ spot_type }}"
         spot_wait_timeout: 45
 
@@ -222,9 +224,7 @@
         - "{{ ec2_vol.results }}"
         - volumes
 
-#    - meta: end_play
-
-- name: Wait for servers to be available
+- name: Wait for servers to be online
   hosts: "{{ 'just_created' }}"
   gather_facts: False
   tasks:

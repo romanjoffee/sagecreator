@@ -5,10 +5,10 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="sagecreator",
-    version="0.0.31",
+    version="0.0.38",
     author="evoneutron",
     author_email="evoneutron@gmail.com",
-    description="Package to provision and install architecture in AWS",
+    description="Package to orchestrate architecture in AWS",
     long_description=long_description,
     long_description_content_type="text/x-rst; charset=UTF-8",
     packages=setuptools.find_packages(),
@@ -18,7 +18,7 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["ansible==2.7.2", "boto==2.49.0", "boto3==1.9.82", "botocore==1.12.82", "click==7.0"],
+    install_requires=["ansible==2.7.2", "boto==2.49.0", "boto3==1.9.82", "botocore==1.12.82", "click==7.0", "pyyaml==5.1"],
     entry_points={
         "console_scripts": [
             "sage=scripts.cli:cli"

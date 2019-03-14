@@ -1,6 +1,4 @@
 ---
-- debug: var=venv_dir
-
 - name: install jupyter pip packages
   pip:
     name: "{{ packages }}"
