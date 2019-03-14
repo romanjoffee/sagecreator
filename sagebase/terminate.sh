@@ -29,7 +29,7 @@ function run() {
     parse_args "$@"
 
     echo "...Terminating cluster..."
-    ansible-playbook -i ${ROOT_DIR}/inventory/stage ${ROOT_DIR}/playbooks/provision/terminate.yml -e service=${service} -vvv
+    ansible-playbook -i ${ROOT_DIR}/inventory/stage/ec2.py ${ROOT_DIR}/playbooks/provision/terminate.yml -e service=${service} #-vvv
     return 0
 }
 
