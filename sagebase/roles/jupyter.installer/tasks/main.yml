@@ -1,5 +1,5 @@
 ---
-- name: install jupyter pip packages
+- name: Install jupyter pip packages
   pip:
     name: "{{ packages }}"
     virtualenv: "{{ venv_dir }}"
