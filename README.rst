@@ -5,10 +5,10 @@ SageCreator
 
 | SageCreator is a package meant to simplify cluster setup for Machine Learning in AWS.
 | It does all the heavy lifting to get cluster up and running in a matter of minutes on any of the AWS instance type(s).
-| It is using **spot instances** by default which can significantly reduce total cost of running the cluster.
+| It uses **spot instances** by default which can significantly reduce total cost of running the cluster.
 | If spot instances are not available or the specified spot instance price is too low, it falls back to **on-demand** instances.
 |
-| After provision you can access **Jupyter notebook** that can run your code against provisioned server(s). See `Jupyter access`_ for more info.
+| You can access **Jupyter notebook** that can run your code against provisioned server(s). See `Jupyter access`_ for more info.
 
 Installation
 ------------
@@ -37,7 +37,7 @@ To provision the cluster you need an `AWS Account`_ and an IAM user with:
 - Access Key ID
 - Secret Access Key
 
-User should either be in **Administrators** group as described in `IAM user`_ tutorial, or create `custom IAM policy`_
+User should either be in **Administrators** group as described in `IAM user`_ tutorial, or create a `custom IAM policy`_
 
 Execution
 ---------
@@ -55,12 +55,12 @@ After the installation, configure the tool by specifying configuration parameter
     Private key file: <Absolute path to private key file> (required only if Key pair name was provided)
 
 | **Company**, **Owner**, **Service** are required - those are used as tags for each instance in the cluster.
-| **Key pair name**, **Private key file** are optional - if explicitly provided, given 'key pair name' / 'private key file' will be used to provision the cluster.
+| **Key pair name**, **Private key file** are optional - if provided, given 'key pair name' / 'private key file' will be used to provision the cluster.
 
 ---------
 
 | Provision the cluster.
-| Provision step can take up to 20 minutes depending on network connection, cluster size, and instance type.
+| Provision step can take up to 20 minutes depending on the network connection, cluster size, and instance type.
 
 .. code-block:: text
 
@@ -73,14 +73,14 @@ After the installation, configure the tool by specifying configuration parameter
 .. image:: https://s3.amazonaws.com/evoneutron/github/sagecreator/provision1080.gif
 
 | **Important**:
-| The tool provides no guarantee that the instance(s) will be provisioned at specified **Spot instance price**.
-| If specified Spot instance price is lower than current AWS spot instance price then **on-demand** instance(s) will be provisioned.
+| The tool does provide guarantee that the cluster with specified configuration will be provisioned.
+| The tool, however, provides no guarantee that the instance(s) will be provisioned at specified **Spot instance price**.
+| If specified price is lower than the current AWS spot instance price then **On-demand** instance(s) will be provisioned instead.
 | Thus, it is up to the user to ensure that specified price is high enough for the request to be fulfilled.
-| The tool does provide guarantee that the cluster with specified configuration will be provisioned and thus it has to fall back to **on-demand** instances if it can't provision spot instances.
 
 ---------
 
-| Show path of the cluster configuration file.
+| Display path of the cluster configuration file.
 | Though not necessary it is possible to manually edit that file with customizations prior to running **provision** step.
 
 .. code-block:: text
@@ -101,8 +101,8 @@ Terminate cluster. This operation terminates all cluster nodes matching tags tup
 Jupyter access
 --------------
 
-| Once provision step is done and cluster is up you can access jupyter notebook in your browser at http://localhost:9000
-| We have provided a sample notebook to train a model on Fashion MNIST dataset using CNN in Keras
+| Once provisioning step is done and the cluster is up you can access jupyter notebook in your browser at http://localhost:9000
+| We have provided a sample notebook to execute. It trains the model on Fashion MNIST dataset using CNN in Keras.
 
 Under the hood
 --------------
@@ -114,7 +114,7 @@ Under the hood
 Custom IAM policy
 -----------------
 
-Alternatively, instead of assigning user to **Administrators** group which has access to all AWS services, one can create separate Group named **Provisioners** with the following policy:
+Alternatively, instead of assigning user to **Administrators** group which has access to all AWS services, one can create separate Group named **Provisioners** with more restrictive policy:
 
 .. code-block:: text
 
