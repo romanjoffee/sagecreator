@@ -8,7 +8,7 @@ SageCreator
 | It is using **spot instances** by default which can significantly reduce total cost of running the cluster.
 | If spot instances are not available or the specified spot instance price is too low, it falls back to **on-demand** instances.
 |
-| After provision you can access **Jupyter notebook** that can run your code against provisioned server(s). See `Jupyter access`_.
+| After provision you can access **Jupyter notebook** that can run your code against provisioned server(s). See `Jupyter access`_ for more info.
 
 Installation
 ------------
@@ -32,11 +32,12 @@ Prerequisites
 
 **AWS Account**
 
-To provision the cluster you need an `AWS Account`_  and `IAM user`_ either in Administrators group or with custom policy:
+To provision the cluster you need an `AWS Account`_ and an IAM user with:
 
 - Access Key ID
 - Secret Access Key
-- Key pair (optional) - if not provided it will be generated and stored locally
+
+User should either be in **Administrators** group as described in `IAM user`_ tutorial, or create `custom IAM policy`_
 
 Execution
 ---------
@@ -51,10 +52,10 @@ After the installation, configure the tool by specifying configuration parameter
     Company: <Name of your organization>
     Owner: <Name of your team>
     Key pair name: <Name of the key pair> (optional - if not provided it will be created with a new private key)
-    Private key file: <Absolute path to private key file> (required only if Key pair name was provided))
+    Private key file: <Absolute path to private key file> (required only if Key pair name was provided)
 
 | **Company**, **Owner**, **Service** are required - those are used as tags for each instance in the cluster.
-| **Key pair name**, **Private key file** are optional - if provided, given 'key pair name' / 'private key file' will be used to provision the cluster.
+| **Key pair name**, **Private key file** are optional - if explicitly provided, given 'key pair name' / 'private key file' will be used to provision the cluster.
 
 ---------
 
@@ -94,13 +95,14 @@ Terminate cluster. This operation terminates all cluster nodes matching tags tup
 .. code-block:: text
 
     $ sage terminate
+    Service: <Name of your service to terminate>
 
 .. _Jupyter access:
 
 Jupyter access
 --------------
 
-| Once provision step is done and cluster is up you can access jupyter notebook on http://localhost:9000
+| Once provision step is done and cluster is up you can access jupyter notebook in your browser at http://localhost:9000
 | We have provided a sample notebook to train a model on Fashion MNIST dataset using CNN in Keras
 
 Under the hood
@@ -108,6 +110,51 @@ Under the hood
 
 | The logic that orchestrates the cluster and deploys the software is written in **Ansible**
 |
+
+.. _custom IAM policy:
+
+Custom IAM policy
+-----------------
+
+Alternatively, instead of assigning user to **Administrators** group which has access to all AWS services, one can create separate Group named **Provisioners** with the following policy:
+
+.. code-block:: text
+
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": "ec2:*",
+          "Effect": "Allow",
+          "Resource": "*"
+        },
+        {
+          "Action": "rds:*",
+          "Effect": "Allow",
+          "Resource": "*"
+        },
+        {
+          "Action": "route53:*",
+          "Effect": "Allow",
+          "Resource": "*"
+        }
+      ]
+    }
+
+Assign user to that group so that it has access only to a subset of AWS services which are sufficient to orchestrate the cluster.
+
+
+SSH access
+----------
+
+| If **Key pair name** / **private key file** were not provided when configuring the cluster then as it gets provisioned default key pair is created and a new private key is stored locally.
+| So in order to ``ssh`` into the servers one needs to point ``ssh`` command to the correct (private key) identity file:
+
+.. code-block:: text
+
+    $ ssh -i <path to identity file> ubuntu@<host>
+
+where default *path to identity file* is *../venv/lib/python3.X/site-packages/sagebase/.ssh/pkey.pem*
 
 
 .. |build-status| image:: https://travis-ci.com/evoneutron/sagecreator.svg?branch=master

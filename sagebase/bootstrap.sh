@@ -72,7 +72,7 @@ function install() {
     local "${@}"
 
     echo "...Installing software..."
-    ansible-playbook --key-file ${private_key_file} -i ${ROOT_DIR}/inventory/stage ${ROOT_DIR}/playbooks/sage/install.yml -e service=${service} #-vvv
+    ansible-playbook --key-file ${private_key_file} -i ${ROOT_DIR}/inventory/stage ${ROOT_DIR}/playbooks/sage/install.yml -e service=${service} -e p_key_path=${private_key_file} #-vvv
     return $NO_ERROR
 }
 
