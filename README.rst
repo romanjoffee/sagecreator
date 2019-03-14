@@ -107,8 +107,7 @@ Jupyter access
 Under the hood
 --------------
 
-| The logic that orchestrates the cluster and deploys the software is written in **Ansible**
-|
+| The logic that orchestrates the cluster is written in `Ansible`_
 
 .. _custom IAM policy:
 
@@ -147,11 +146,11 @@ SSH access
 ----------
 
 | If **Key pair name** / **Private key file** were NOT provided when configuring the cluster then default key pair is created and a new private key is stored locally.
-| In order to ``ssh`` into the servers one needs to point ``ssh`` command to the correct (private key) file:
+| In order to ``ssh`` into the servers point ``ssh`` to the correct (private key) file:
 
 .. code-block:: text
 
-    $ ssh -i <path to identity file> ubuntu@<host>
+    $ ssh -i <path to private key file> ubuntu@<host>
 
 where *path to private key file* is ``../venv/lib/python3.X/site-packages/sagebase/.ssh/pkey.pem``
 
@@ -162,3 +161,5 @@ where *path to private key file* is ``../venv/lib/python3.X/site-packages/sageba
 .. _`AWS Account`: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/get-set-up-for-amazon-ec2.html#sign-up-for-aws
 
 .. _`IAM User`: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/get-set-up-for-amazon-ec2.html#create-an-iam-user
+
+.. _`Ansible`: https://www.ansible.com
