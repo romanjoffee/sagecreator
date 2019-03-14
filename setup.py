@@ -18,7 +18,7 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["ansible==2.7.2", "boto==2.49.0", "boto3==1.9.82", "botocore==1.12.82", "click==7.0"],
+    install_requires=["ansible==2.7.2", "boto==2.49.0", "boto3==1.9.82", "botocore==1.12.82", "click==7.0", "pyyaml==5.1"],
     entry_points={
         "console_scripts": [
             "sage=scripts.cli:cli"

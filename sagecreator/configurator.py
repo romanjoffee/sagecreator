@@ -35,12 +35,12 @@ class Configurator:
             raise ValueError("Template file with default configuration settings could not be read")
 
         with open(str(file_path), "r") as stream:
-            template = yaml.load(stream)
+            template = yaml.safe_load(stream)
         return template
 
     def get_properties(self):
         with open(self.get_config_path(), "r") as stream:
-            props = yaml.load(stream)
+            props = yaml.safe_load(stream)
         return props
 
     def get_config_path(self):
@@ -52,5 +52,5 @@ class Configurator:
     # def get_valid_instance_types(self):
     #     valid_types_path = "{}/inventory/stage/group_vars/all/{}".format(self._root_path, "valid_instance_types.yml")
     #     with open(str(valid_types_path), "r") as stream:
-    #         props = yaml.load(stream)
+    #         props = yaml.safe_load(stream)
     #     return props.get("valid_instance_types")
