@@ -51,7 +51,7 @@ After the installation, configure the tool by specifying configuration parameter
     Secret access key: <AWS Secret Access Key>
     Company: <Name of your organization>
     Owner: <Name of your team>
-    Key pair name: <Name of the key pair> (optional - if not provided it will be created with a new private key)
+    Key pair name: <Name of the key pair> (optional - if NOT provided it will be created with a new private key)
     Private key file: <Absolute path to private key file> (required only if Key pair name was provided)
 
 | **Company**, **Owner**, **Service** are required - those are used as tags for each instance in the cluster.
@@ -61,7 +61,6 @@ After the installation, configure the tool by specifying configuration parameter
 
 | Provision the cluster.
 | Provision step can take up to 20 minutes depending on network connection, cluster size, and instance type.
-|
 
 .. code-block:: text
 
@@ -141,20 +140,20 @@ Alternatively, instead of assigning user to **Administrators** group which has a
       ]
     }
 
-Assign user to that group so that it has access only to a subset of AWS services which are sufficient to orchestrate the cluster.
+Then assign the user to the **Provisioners** group that has access to a subset of AWS services that are sufficient to orchestrate the cluster.
 
 
 SSH access
 ----------
 
-| If **Key pair name** / **private key file** were not provided when configuring the cluster then as it gets provisioned default key pair is created and a new private key is stored locally.
-| So in order to ``ssh`` into the servers one needs to point ``ssh`` command to the correct (private key) identity file:
+| If **Key pair name** / **Private key file** were NOT provided when configuring the cluster then default key pair is created and a new private key is stored locally.
+| In order to ``ssh`` into the servers one needs to point ``ssh`` command to the correct (private key) file:
 
 .. code-block:: text
 
     $ ssh -i <path to identity file> ubuntu@<host>
 
-where default *path to identity file* is *../venv/lib/python3.X/site-packages/sagebase/.ssh/pkey.pem*
+where *path to private key file* is ``../venv/lib/python3.X/site-packages/sagebase/.ssh/pkey.pem``
 
 
 .. |build-status| image:: https://travis-ci.com/evoneutron/sagecreator.svg?branch=master

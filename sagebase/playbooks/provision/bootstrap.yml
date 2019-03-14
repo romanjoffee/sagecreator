@@ -224,8 +224,7 @@
         - "{{ ec2_vol.results }}"
         - volumes
 
-
-- name: Wait for servers to be available
+- name: Wait for servers to be online
   hosts: "{{ 'just_created' }}"
   gather_facts: False
   tasks:

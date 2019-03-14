@@ -62,7 +62,7 @@ function provision() {
     parse_args "$@"
 
     echo "...Provisioning cluster..."
-    ansible-playbook --key-file ${private_key_file} -i ${ROOT_DIR}/inventory/stage ${ROOT_DIR}/playbooks/sage/aws_provision.yml -e service=${service} -e instance_type=${instance_type} -e spot_price=${spot_price} -e cluster_size=${cluster_size} #-vvv
+    ansible-playbook --key-file ${private_key_file} -i ${ROOT_DIR}/inventory/stage ${ROOT_DIR}/playbooks/provision/bootstrap.yml -e service=${service} -e instance_type=${instance_type} -e spot_price=${spot_price} -e cluster_size=${cluster_size} #-vvv
     return $NO_ERROR
 }
 
