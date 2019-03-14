@@ -5,10 +5,10 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="sagecreator",
-    version="0.0.36",
+    version="0.0.37",
     author="evoneutron",
     author_email="evoneutron@gmail.com",
-    description="Package to provision and install architecture in AWS",
+    description="Package to orchestrate architecture in AWS",
     long_description=long_description,
     long_description_content_type="text/x-rst; charset=UTF-8",
     packages=setuptools.find_packages(),

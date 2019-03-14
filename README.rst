@@ -19,7 +19,7 @@ Install and update using `pip`_:
 
     $ pip install sagecreator
 
-Python is required and it is highly recommended to install and run the package in `virtualenv`_.
+Python 3 is required and it is highly recommended to install and run the package in `virtualenv`_.
 Supported in Python >= 3.5.0.
 
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
@@ -51,7 +51,7 @@ After the installation, configure the tool by specifying configuration parameter
     Secret access key: <AWS Secret Access Key>
     Company: <Name of your organization>
     Owner: <Name of your team>
-    Key pair name: <Name of the key pair> (optional - if NOT provided it will be created with a new private key)
+    Key pair name: <Name of the key pair> (Optional - if NOT provided it will be created with a new private key)
     Private key file: <Absolute path to private key file> (required only if Key pair name was provided)
 
 | **Company**, **Owner**, **Service** are required - those are used as tags for each instance in the cluster.
@@ -66,15 +66,14 @@ After the installation, configure the tool by specifying configuration parameter
 
     $ sage provision
     Service: <Name of your service>
-    Instance type [t3.small]: <Instance type> (optional, defaults to t3.small)
-    Spot instance price [0.1]: <Spot instance price> (optional, defaults to $0.1 per instance)
-    Cluster size [1]: <Cluster size> (optional, defaults to 1 node)
+    Instance type [t3.small]: <Instance type> (Optional, defaults to t3.small)
+    Spot instance price [0.1]: <Spot instance price> (Optional, defaults to $0.1 per instance)
+    Cluster size [1]: <Cluster size> (Optional, defaults to 1 node)
 
 .. image:: https://s3.amazonaws.com/evoneutron/github/sagecreator/provision1080.gif
 
 | **Important**:
-| The tool does provide guarantee that the cluster with specified configuration will be provisioned.
-| The tool, however, provides no guarantee that the instance(s) will be provisioned at specified **Spot instance price**.
+| The tool provides NO guarantee that the instance(s) will be provisioned at specified **Spot instance price**.
 | If specified price is lower than the current AWS spot instance price then **On-demand** instance(s) will be provisioned instead.
 | Thus, it is up to the user to ensure that specified price is high enough for the request to be fulfilled.
 
@@ -89,7 +88,7 @@ After the installation, configure the tool by specifying configuration parameter
 
 ---------
 
-Terminate cluster. This operation terminates all cluster nodes matching tags tuple of **Company**, **Owner**, **Service**.
+| Terminate cluster. This operation terminates all cluster nodes matching tags tuple of **Company**, **Owner**, **Service**.
 
 .. code-block:: text
 
@@ -101,7 +100,7 @@ Terminate cluster. This operation terminates all cluster nodes matching tags tup
 Jupyter access
 --------------
 
-| Once provisioning step is done and the cluster is up you can access jupyter notebook in your browser at http://localhost:9000
+| Once provisioning step is done and the cluster is up you can access jupyter notebook in your browser at http://localhost:9000.
 | We have provided a sample notebook to execute. It trains the model on Fashion MNIST dataset using CNN in Keras.
 
 Under the hood
@@ -114,7 +113,7 @@ Under the hood
 Custom IAM policy
 -----------------
 
-Alternatively, instead of assigning user to **Administrators** group which has access to all AWS services, one can create separate Group named **Provisioners** with more restrictive policy:
+Alternatively, instead of assigning user to **Administrators** group which has access to all AWS services (as described in `IAM user`_), you can create separate Group named **Provisioners** with more restrictive policy:
 
 .. code-block:: text
 
@@ -139,7 +138,7 @@ Alternatively, instead of assigning user to **Administrators** group which has a
       ]
     }
 
-Then assign the user to the **Provisioners** group that has access to a subset of AWS services that are sufficient to orchestrate the cluster.
+Then assign the user to the **Provisioners** group which has access to a subset of AWS services that are sufficient to orchestrate the cluster.
 
 
 SSH access
