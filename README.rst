@@ -1,4 +1,4 @@
-|build-status|
+|build-status| |pypi-reference| |pypi-downloads|
 
 SageCreator
 ===========
@@ -156,6 +156,12 @@ where *path to private key file* is ``../venv/lib/python3.X/site-packages/sageba
 
 .. |build-status| image:: https://travis-ci.com/evoneutron/sagecreator.svg?branch=master
     :target: https://travis-ci.com/evoneutron/sagecreator
+
+.. |pypi-reference| image:: https://badge.fury.io/py/sagecreator.svg
+   :target: https://badge.fury.io/py/sagecreator
+
+.. |pypi-downloads| image:: https://pepy.tech/badge/sagecreator
+   :target: https://pepy.tech/project/sagecreator
 
 .. _`AWS Account`: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/get-set-up-for-amazon-ec2.html#sign-up-for-aws
 
