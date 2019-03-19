@@ -18,7 +18,7 @@ app_group: ubuntu
 default_aws_region: us-east-1
 default_cidr_block: 10.100.0.0/16
 default_ami_os_type: "ubuntu"
-default_ami_id: "ami-0f9e8c4a1305ecd22"   #ubuntu dl
+default_ami_id: "ami-0d96d570269578cd7"   #ubuntu dl
 default_private_key_file_name: "pkey.pem"
 
 default_azs: ['{{ default_aws_region }}a','{{ default_aws_region }}b','{{ default_aws_region }}c','{{ default_aws_region }}d','{{ default_aws_region }}e']
