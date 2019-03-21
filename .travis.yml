@@ -5,5 +5,8 @@ python:
   - "3.7-dev"
 install:
   - pip install -r requirements.txt
+  - pip install codecov==2.0.15
+  - pip install pytest-cov==2.6.1
 script:
-  - pytest
+  - pytest --cov=./
+  - codecov
