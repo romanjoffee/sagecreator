@@ -70,7 +70,7 @@ After the installation, configure the tool by specifying configuration parameter
     Spot instance price [0.1]: <Spot instance price> (Optional, defaults to $0.1 per instance)
     Cluster size [1]: <Cluster size> (Optional, defaults to 1 node)
 
-.. image:: https://s3.amazonaws.com/evoneutron/github/sagecreator/provision1080.gif
+.. image:: https://s3.amazonaws.com/romanjoffee/github/sagecreator/provision1080.gif
 
 | **Important**:
 | The tool provides NO guarantee that the instance(s) will be provisioned at specified **Spot instance price**.
@@ -154,8 +154,8 @@ SSH access
 where *path to private key file* is ``../venv/lib/python3.X/site-packages/sagebase/.ssh/pkey.pem``
 
 
-.. |build-status| image:: https://travis-ci.com/evoneutron/sagecreator.svg?branch=master
-    :target: https://travis-ci.com/evoneutron/sagecreator
+.. |build-status| image:: https://travis-ci.com/romanjoffee/sagecreator.svg?branch=master
+    :target: https://travis-ci.com/romanjoffee/sagecreator
 
 .. |pypi-reference| image:: https://badge.fury.io/py/sagecreator.svg
    :target: https://badge.fury.io/py/sagecreator

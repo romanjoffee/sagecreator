@@ -5,14 +5,14 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="sagecreator",
-    version="0.1.1",
-    author="evoneutron",
-    author_email="evoneutron@gmail.com",
+    version="0.1.1.3",
+    author="romanjoffee",
+    author_email="roman.jugai@gmail.com",
     description="Package to orchestrate architecture in AWS",
     long_description=long_description,
     long_description_content_type="text/x-rst; charset=UTF-8",
     packages=setuptools.find_packages(),
-    url="https://github.com/evoneutron/sagecreator",
+    url="https://github.com/romanjoffee/sagecreator",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
