@@ -1,4 +1,4 @@
-|build-status| |pypi-reference| |pypi-downloads|
+|build-status| |coverage-status| |pypi-reference| |pypi-downloads|
 
 SageCreator
 ===========
@@ -156,6 +156,9 @@ where *path to private key file* is ``../venv/lib/python3.X/site-packages/sageba
 
 .. |build-status| image:: https://travis-ci.com/romanjoffee/sagecreator.svg?branch=master
     :target: https://travis-ci.com/romanjoffee/sagecreator
+
+.. |coverage-status| image:: https://codecov.io/gh/romanjoffee/sagecreator/branch/master/graphs/badge.svg
+   :target: https://codecov.io/gh/romanjoffee/sagecreator/branch/master
 
 .. |pypi-reference| image:: https://badge.fury.io/py/sagecreator.svg
    :target: https://badge.fury.io/py/sagecreator
