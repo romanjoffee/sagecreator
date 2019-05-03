@@ -67,6 +67,8 @@ class Application(object):
             'volume_size': self.root_volume_size,
             'delete_on_termination': self.ebs_delete_on_termination
         }
+        if self.root_volume_type == "io1" and self.root_volume_iops:
+            root_device['iops'] = self.root_volume_iops;
 
         if self.os_type == 'debian':
             root_device['device_name'] = '/dev/xvda'
@@ -145,6 +147,7 @@ def main():
         os_type=dict(required=True, type='str', choices=['debian', 'ubuntu', 'bionic']),
         root_volume_size=dict(required=False, type='str'),
         root_volume_type=dict(required=False, type='str', choices=['gp2', 'io1', 'standard'], default='standard'),
+        root_volume_iops=dict(required=False, type='int'),
         ebs_create_volumes=dict(required=False, type='bool'),
         ebs_volume_count=dict(required=False, type='int'),
         ebs_volume_type=dict(required=False, type='str', choices=['gp2', 'io1', 'standard'], default='standard'),

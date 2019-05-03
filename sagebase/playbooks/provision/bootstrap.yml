@@ -3,12 +3,14 @@
   connection: local
   gather_facts: False
   vars:
-    _aws_region: "{{ aws_region | default(default_aws_region) }}"
+    _service: "{{ service }}"
     _instance_type: "{{ instance_type }}"
-    _spot_price: "{{ spot_price }}"
     _cluster_size: "{{ cluster_size }}"
+    _ami_id: "{{ ami_id | default(default_ami_id, true) }}"
+    _spot_price: "{{ spot_price | default(omit) }}"
     _ec2_termination_protection: "{{ ec2_termination_protection | default(False) }}"
     _user_data_script: "{{ playbook_dir }}/../../templates/user_data.sh"
+    _aws_region: "{{ aws_region | default(default_aws_region) }}"
 
   tasks:
 #    - name: Printing all the environment​ variables
@@ -36,7 +38,7 @@
 
     - set_fact:
         vpc_id: "{{ vpc_existing.vpcs[0].vpc_id if (vpc_existing.vpcs is defined and (vpc_existing.vpcs|length) > 0) else vpc_new.vpc.id }}"
-        security_group_name: "{{ company }}-{{ owner }}-{{ service }}-{{ env }}"
+        security_group_name: "{{ company }}-{{ owner }}-{{ _service }}-{{ env }}"
 
     - name: Get igw
       ec2_vpc_igw:
@@ -82,7 +84,7 @@
     - name: Find AMI
       ec2_ami_facts:
         region: "{{ _aws_region }}"
-        image_ids: "{{ ami_id | default(default_ami_id) }}"
+        image_ids: "{{ _ami_id }}"
       register: ami
 
     - name: Map disks
@@ -90,9 +92,10 @@
         instance_type: "{{ _instance_type }}"
         os_type: "{{ default_ami_os_type }}"
         root_volume_type: "{{ root_volume_type | default('standard') }}"
-        root_volume_size: "{{ root_volume_size | default(75) }}"
+        root_volume_size: "{{ root_volume_size | default(8) }}"
+        root_volume_iops: "{{ root_volume_iops | default(omit) }}"
         ebs_create_volumes: "{{ ebs_create_volumes | default(False) }}"
-        ebs_volume_size: "{{ ebs_volume_size_gb | default(40) }}"
+        ebs_volume_size: "{{ ebs_volume_size_gb | default(10) }}"
         ebs_volume_iops: "{{ ebs_volume_iops | default(omit) }}"
         ebs_volume_type: "{{ ebs_volume_type | default('standard') }}"
         ebs_volume_count: "{{ ebs_volume_count | default(1) }}"
@@ -102,7 +105,7 @@
     - name: Create security group if absent
       ec2_group:
         name: "{{ security_group_name }}"
-        description: "Security group of {{ service }}"
+        description: "Security group of {{ _service }}"
         vpc_id: "{{ vpc_id }}"
         region: "{{ _aws_region }}"
         rules:
@@ -113,6 +116,10 @@
             ports: 22
             cidr_ip: 0.0.0.0/0
             rule_desc: "ssh"
+          - proto: tcp
+            ports: 80
+            cidr_ip: 0.0.0.0/0
+            rule_desc: "http"
         rules_egress:
           - proto: all
             ports: 0-65535
@@ -170,12 +177,12 @@
         count_tag:
           Company: "{{ company }}"
           Owner: "{{ owner }}"
-          Service: "{{ service }}"
+          Service: "{{ _service }}"
           Environment: "{{ env }}"
         instance_tags:
           Company: "{{ company }}"
           Owner: "{{ owner }}"
-          Service: "{{ service }}"
+          Service: "{{ _service }}"
           Environment: "{{ env }}"
       register: ec2
 
@@ -184,17 +191,17 @@
       args:
         tags:
           Name: "{{ item.name }}"
-      with_items: "{{ query('instance_name_mapping', env=env, owner=owner, service=service, instances=ec2.instances) }}"
+      with_items: "{{ query('instance_name_mapping', env=env, owner=owner, service=_service, instances=ec2.instances) }}"
       register: tagged_instances
 
-    - debug: var=tagged_instances
+#    - debug: var=tagged_instances
 
     - name: Add to inventory
       add_host: >
         hostname={{ item.item.public_dns_name }}
         groupname='just_created'
-        service={{ service }}
-        ec2_tag_Service={{ service }}
+        service={{ _service }}
+        ec2_tag_Service={{ _service }}
         ec2_tag_Name={{ item.item.name }}
         ec2_tag_Owner={{ owner }}
         ec2_private_ip_address={{ item.item.private_ip }}
@@ -218,7 +225,7 @@
         tags:
           Company: "{{ company }}"
           Owner: "{{ owner }}"
-          Service: "{{ service }}"
+          Service: "{{ _service }}"
           Environment: "{{ env }}"
       with_subelements:
         - "{{ ec2_vol.results }}"
