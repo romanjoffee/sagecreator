@@ -1,0 +1,21 @@
+---
+- name: Get remote hosts for the service
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    service: "{{ service }}"
+  tasks:
+    - set_fact:
+        service_hosts: "{{ query('hosts_by_service', env=env, owner=owner, service=service) }}"
+
+- name: Install software
+  hosts: "{{ hostvars['localhost']['service_hosts'] | map(attribute='ip_address') | list }}"
+  gather_facts: True
+
+  pre_tasks:
+    - set_fact:
+        service_hosts: "{{ hostvars['localhost']['service_hosts'] }}"
+
+  roles:
+    - webserver.installer

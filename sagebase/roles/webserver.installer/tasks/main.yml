@@ -1,0 +1,227 @@
+---
+- name: Update apt cache
+  become: true
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: Install required system packages
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - apache2
+      - python3-pymysql
+      - mysql-server
+      - php7.2-mysql
+      - php7.2
+      - libapache2-mod-php7.2
+      - php7.2-gd
+      - php7.2-ssh2
+  become: yes
+
+#mysql
+
+- name: Ensure mysql is running and starts on boot
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Ensure mysql root password is updated for all root accounts
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    password: "{{ mysql.root_password }}"
+    priv: '*.*:ALL,GRANT'
+    check_implicit_admin: yes
+  with_items:
+    - "{{ service_hosts[0].ip_address }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+  become: yes
+  notify:
+    - restart mysql
+
+- name: Create `/root/.my.cnf` with root password credentials
+  template:
+    src:  my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    mode: 0600
+  become: yes
+  notify:
+    - restart mysql
+
+- name: Create wordpress mysql database
+  become: true
+  mysql_db:
+    name: "{{ mysql.wp_db }}"
+    state: present
+
+- name: Create mysql user
+  mysql_user:
+    name: "{{ mysql.wp_user }}"
+    password: "{{ mysql.wp_password }}"
+    priv: "*.*:ALL"
+  become: yes
+
+- name: Ensure wp user is updated for all accounts
+  mysql_user:
+    name: "{{ mysql.wp_user }}"
+    host: "{{ item }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    password: "{{ mysql.wp_password }}"
+    priv: "*.*:ALL"
+    check_implicit_admin: yes
+  with_items:
+    - "{{ service_hosts[0].ip_address }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+  become: yes
+  notify:
+    - restart mysql
+
+- name: Create ftp root directory
+  file:
+    path: "/var/www/ftp"
+    state: directory
+    mode: a-w
+    owner: nobody
+    group: nogroup
+  register: ftp_root_dir
+  become: yes
+
+#user setup
+
+- name: Add group for the user
+  group:
+    name: "{{ wp_unix_group }}"
+  become: yes
+
+- name: Add unix user
+  user:
+    name: "{{ wp_unix_user }}"
+    password:  "{{ wp_unix_password | password_hash('sha512') }}"
+    group: "{{ wp_unix_group }}"
+    home: "{{ ftp_root_dir.path }}/{{ wp_unix_user }}"
+  become: yes
+
+- name: Ensure home directory ownership
+  file:
+    path: "{{ ftp_root_dir.path }}/{{ wp_unix_user }}"
+    state: directory
+    mode: 0755
+    owner: "{{ wp_unix_user }}"
+    group: "{{ wp_unix_group }}"
+    recurse: yes
+  register: home_dir
+  become: yes
+
+#ftp setup
+
+- name: Install vsftpd
+  apt:
+    name: vsftpd
+    state: present
+  become: yes
+
+- name: Modify vsftpd settings
+  lineinfile:
+    backup: yes
+    dest: "/etc/vsftpd.conf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertbefore: BOF
+  with_items:
+    - { regexp: '^#chroot_local_user=YES', line: 'chroot_local_user=YES' }
+    - { regexp: '^#local_enable=YES', line: 'local_enable=YES' }
+    - { regexp: '^#write_enable=YES', line: 'write_enable=YES' }
+    - { regexp: '^#user_sub_token=$USER', line: 'user_sub_token=$USER' }
+    - { regexp: '^#local_root=/var/www/ftp', line: 'local_root=/var/www/ftp' }
+    - { regexp: '^#userlist_enable=YES', line: 'userlist_enable=YES' }
+    - { regexp: '^#userlist_file=/etc/vsftpd.userlist', line: 'userlist_file=/etc/vsftpd.userlist' }
+    - { regexp: '^#userlist_deny=NO', line: 'userlist_deny=NO' }
+  become: yes
+
+- name: Add new user to vsftpd.userlist
+  lineinfile:
+    path: /etc/vsftpd.userlist
+    line: "{{ wp_unix_user }}"
+    create: yes
+  become: yes
+  notify:
+    - restart vsftpd
+
+#firewall
+
+- name: Allow firewall access to ftp/ssh/mysql ports
+  ufw:
+    rule: allow
+    port: '{{ item }}'
+    proto: tcp
+  with_items:
+    - 20
+    - 21
+    - 22
+    - 10000:11000
+    - 80
+    - 3306
+  become: yes
+  notify:
+    - restart vsftpd
+
+# Wordpress installation
+
+- name: Download wordpress
+  get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /tmp/wordpress.tar.gz
+    validate_certs: no
+
+- name: Extract wordpress
+  unarchive: src=/tmp/wordpress.tar.gz dest={{ home_dir.path }} copy=no
+  become: yes
+
+- name: Ensure ownership of wordpress directory
+  file:
+    path: "{{ home_dir.path }}/wordpress"
+    mode: 0755
+    owner: "{{ wp_unix_user }}"
+    group: "{{ wp_unix_group }}"
+    recurse: yes
+  register: wordpress_dir
+  become: yes
+
+- name: Use sample config file
+  command: mv {{ wordpress_dir.path }}/wp-config-sample.php {{ wordpress_dir.path }}/wp-config.php creates={{ wordpress_dir.path }}/wp-config.php
+  become: yes
+
+- name: Update wordpress config file
+  lineinfile:
+    dest: "{{ wordpress_dir.path }}/wp-config.php"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - {'regexp': "define\\(\\s*'DB_NAME'\\s*,\\s*'(.)+'\\s*\\);", 'line': "define('DB_NAME', '{{ mysql.wp_db }}');"}
+    - {'regexp': "define\\(\\s*'DB_USER'\\s*,\\s*'(.)+'\\s*\\);", 'line': "define('DB_USER', '{{ mysql.wp_user }}');"}
+    - {'regexp': "define\\(\\s*'DB_PASSWORD'\\s*,\\s*'(.)+'\\s*\\);", 'line': "define('DB_PASSWORD', '{{ mysql.wp_password }}');"}
+  become: yes
+  notify:
+    - restart apache
+
+- name: Update default Apache site
+  become: yes
+  lineinfile:
+    dest=/etc/apache2/sites-enabled/000-default.conf
+    regexp="(.)+DocumentRoot /var/www/html"
+    line="DocumentRoot {{ wordpress_dir.path }}"
+  notify:
+    - restart apache
+
+
+

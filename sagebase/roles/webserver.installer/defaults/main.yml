@@ -1,0 +1,10 @@
+---
+wp_unix_group: wordp
+wp_unix_user: wordp
+wp_unix_password: thepassword
+
+mysql:
+  root_password: thepassword
+  wp_db: wordpress
+  wp_user: wordpress
+  wp_password: thepassword
