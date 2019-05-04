@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="sagecreator",
-    version="0.1.1.4",
+    version="0.1.1.6",
     author="romanjoffee",
     author_email="roman.jugai@gmail.com",
     description="Package to orchestrate architecture in AWS",
