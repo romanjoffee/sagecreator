@@ -8,3 +8,7 @@ mysql:
   wp_db: wordpress
   wp_user: wordpress
   wp_password: thepassword
+
+vsftpd:
+  self_signed_cert: /etc/ssl/certs/vsftpdt.crt
+  self_signed_key: /etc/ssl/private/vsftpdt.pem

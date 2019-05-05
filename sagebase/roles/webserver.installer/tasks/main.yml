@@ -133,6 +133,11 @@
     state: present
   become: yes
 
+- name: Create self-signed certificate
+  command: >
+    openssl req -x509 -nodes -subj '/CN={{ cname }}/O=Maudes LTD./C=US' -days 365 -newkey rsa:2048 -sha256 -keyout {{ vsftpd.self_signed_key }} -out {{ vsftpd.self_signed_cert }} creates={{ vsftpd.self_signed_cert }}
+  become: yes
+
 - name: Modify vsftpd settings
   lineinfile:
     backup: yes
@@ -141,15 +146,26 @@
     line: "{{ item.line }}"
     insertbefore: BOF
   with_items:
-    - { regexp: '^#chroot_local_user=YES', line: 'chroot_local_user=YES' }
-    - { regexp: '^#local_enable=YES', line: 'local_enable=YES' }
-    - { regexp: '^#write_enable=YES', line: 'write_enable=YES' }
-    - { regexp: '^#user_sub_token=$USER', line: 'user_sub_token=$USER' }
-    - { regexp: '^#local_root=/var/www/ftp', line: 'local_root=/var/www/ftp' }
-    - { regexp: '^#userlist_enable=YES', line: 'userlist_enable=YES' }
-    - { regexp: '^#userlist_file=/etc/vsftpd.userlist', line: 'userlist_file=/etc/vsftpd.userlist' }
-    - { regexp: '^#userlist_deny=NO', line: 'userlist_deny=NO' }
+    - { regexp: '^(#?)chroot_local_user=', line: 'chroot_local_user=YES' }
+    - { regexp: '^(#?)local_enable=', line: 'local_enable=YES' }
+    - { regexp: '^(#?)write_enable=YES', line: 'write_enable=YES' }
+    - { regexp: '^(#?)user_sub_token=', line: 'user_sub_token=$USER' }
+    - { regexp: '^(#?)local_root=', line: 'local_root=/var/www/ftp' }
+    - { regexp: '^(#?)userlist_enable=', line: 'userlist_enable=YES' }
+    - { regexp: '^(#?)userlist_file=/etc/vsftpd.userlist', line: 'userlist_file=/etc/vsftpd.userlist' }
+    - { regexp: '^(#?)userlist_deny=NO', line: 'userlist_deny=NO' }
+    - { regexp: '^(#?)rsa_cert_file=', line: 'rsa_cert_file={{ vsftpd.self_signed_cert }}' }
+    - { regexp: '^(#?)rsa_private_key_file=', line: 'rsa_private_key_file={{ vsftpd.self_signed_key }}' }
+    - { regexp: '^(#?)ssl_enable=', line: 'ssl_enable=YES' }
+    - { regexp: '^(#?)allow_anon_ssl=', line: 'allow_anon_ssl=NO' }
+    - { regexp: '^(#?)force_local_data_ssl=', line: 'force_local_data_ssl=YES' }
+    - { regexp: '^(#?)force_local_logins_ssl=', line: 'force_local_logins_ssl=YES' }
+    - { regexp: '^(#?)ssl_tlsv1=', line: 'ssl_tlsv1=YES' }
+    - { regexp: '^(#?)ssl_sslv2=', line: 'ssl_sslv2=NO' }
+    - { regexp: '^(#?)ssl_sslv2=', line: 'ssl_sslv2=NO' }
   become: yes
+  notify:
+    - restart vsftpd
 
 - name: Add new user to vsftpd.userlist
   lineinfile:
