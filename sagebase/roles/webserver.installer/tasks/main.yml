@@ -107,8 +107,11 @@
   user:
     name: "{{ wp_unix_user }}"
     password:  "{{ wp_unix_password | password_hash('sha512') }}"
-    group: "{{ wp_unix_group }}"
     home: "{{ ftp_root_dir.path }}/{{ wp_unix_user }}"
+    group: "{{ wp_unix_group }}"
+    groups:
+      - "{{ wp_unix_group }}"
+      - "www-data" # apache
   become: yes
 
 - name: Ensure home directory ownership
@@ -195,6 +198,14 @@
     group: "{{ wp_unix_group }}"
     recurse: yes
   register: wordpress_dir
+  become: yes
+
+- name: Ensure ownership of wp-content directory
+  file:
+    path: "{{ wordpress_dir.path }}/wp-content"
+    mode: 0775
+    owner: "{{ wp_unix_user }}"
+    group: "www-data"
   become: yes
 
 - name: Use sample config file
