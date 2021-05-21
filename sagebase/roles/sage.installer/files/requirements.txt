@@ -7,5 +7,5 @@ keras==2.2.4
 Pillow==5.3.0
 tflearn==0.3.2
 flask==1.0.2
-tensorflow==1.12.2
+tensorflow==2.5.0
 tensorflow-gpu==1.12.2
